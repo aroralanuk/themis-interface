@@ -26,6 +26,7 @@ import { tokensPerPage } from 'config';
 import { parseScriptType, parseAspectRatio } from 'utils/scriptJSON';
 import { OrderDirection } from 'utils/types';
 import Collapsible from './Collapsible';
+import Timer from './Timer';
 
 interface Props {
   id: string;
@@ -69,6 +70,7 @@ const ProjectDetails = ({ id }: Props) => {
   }
 
   const project = data?.project;
+  console.log(project);
   const token = project?.tokens[0];
   const width = size.width > theme.breakpoints.values.md
     ? (Math.min(size.width, 1200)- 48)*0.666666
@@ -88,22 +90,22 @@ const ProjectDetails = ({ id }: Props) => {
     maxInvocations,
     scriptJSON,
   } = project;
-  
-  return project && (
-    <Box>
-      <Breadcrumbs aria-label="breadcrumb" sx={{ marginBottom: 4 }}>
-        <Link href="/" underline="hover" sx={{ color: '#666' }}>
-          Home
-        </Link>
-        <Typography>
-          { name }
-        </Typography>
-      </Breadcrumbs>
 
+  const des =
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
 
-      <Grid spacing={2} container>
-        {
-          project.tokens?.length > 0 && (
+  return (
+    project && (
+      <Box>
+        <Breadcrumbs aria-label='breadcrumb' sx={{ marginBottom: 4 }}>
+          <Link href='/' underline='hover' sx={{ color: '#666' }}>
+            Home
+          </Link>
+          <Typography>Test Collection</Typography>
+        </Breadcrumbs>
+
+        <Grid spacing={2} container>
+          {project.tokens?.length > 0 && (
             <Grid item md={8}>
               <TokenPreview
                 id={token.id}
@@ -115,88 +117,80 @@ const ProjectDetails = ({ id }: Props) => {
                 showLiveViewLink
               />
             </Grid>
-          )
-        }
-        
-        <Grid item md={4} xs={12} sm={12}>
-          <Box sx={{ width: '100%', paddingLeft: [0, 0, 2]}}>
-            <ProjectStats
-              paused={paused}
-              complete={complete}
-              startTime={project?.minterConfiguration?.startTime}
-            />
-            
-            <Typography variant="h4" mt={3}>
-              { name } 
+          )}
+
+          <Grid item md={4} xs={12} sm={12}>
+            <Box sx={{ width: '100%', paddingLeft: [0, 0, 2] }}>
+              <ProjectStats paused={paused} complete={complete} startTime={project?.minterConfiguration?.startTime} />
+
+              <Typography variant='h4' mt={3}>
+                {/* {name} */}
+                Test collection
+              </Typography>
+
+              <Typography variant='h6' mb={2}>
+                Mike Hunt
+                {/* {artistName} */}
+              </Typography>
+
+              <Divider sx={{ display: ['none', 'block', 'none'], marginBottom: 2 }} />
+
+              <Typography variant='h6' mt={3}>
+                Bid deadline
+              </Typography>
+              <Timer deadline='1672487197000' />
+
+              <Box sx={{ fontWeight: 'bold' }}>
+                {invocations} / {maxInvocations} minted
+              </Box>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 3,
+                }}
+              >
+                <LinearProgress
+                  sx={{ width: 'calc(100% - 48px)' }}
+                  value={(invocations / maxInvocations) * 100}
+                  variant='determinate'
+                />
+                <Box sx={{ fontSize: 12 }}>{Math.floor((invocations / maxInvocations) * 100)} %</Box>
+              </Box>
+
+              <PurchaseProject project={project} />
+            </Box>
+          </Grid>
+        </Grid>
+
+        <Grid spacing={2} container mt={4} pb={4}>
+          <Grid item md={7} sm={12} xs={12}>
+            <Typography variant='h6' mb={2}>
+              {/* About {name} */}
+              About Test Collection
             </Typography>
-
-            <Typography variant="h6" mb={2}>
-              { artistName }
-            </Typography>
-
-            <Divider sx={{ display: ['none', 'block', 'none'], marginBottom: 2 }} />
-
-            <Box sx={{ fontWeight: 'bold' }}>
-              { invocations } / { maxInvocations } minted
+            <Box paddingRight={[0, 0, 4]}>
+              <Collapsible content={des} />
             </Box>
 
-            <Box sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 3,
-            }}>
-              <LinearProgress
-                sx={{ width: 'calc(100% - 48px)' }}
-                value={(invocations/maxInvocations)*100}
-                variant="determinate"
-              />
-              <Box sx={{ fontSize: 12 }}>
-                { Math.floor((invocations/maxInvocations)*100) } %
+            <Box sx={{ display: 'flex', marginTop: 4 }}>
+              <Box mr={6}>
+                <Title>License</Title>
+                <Typography>{license}</Typography>
+              </Box>
+
+              <Box>
+                <Title>Library</Title>
+                <Typography>{parseScriptType(scriptJSON)}</Typography>
               </Box>
             </Box>
+          </Grid>
 
-            <PurchaseProject project={project} />
-
-          </Box>
-        </Grid>
-      </Grid>
-
-      <Grid spacing={2} container mt={4} pb={4}>
-        <Grid item md={7} sm={12} xs={12}>
-          <Typography variant="h6" mb={2}>
-            About { name }
-          </Typography>
-          <Box paddingRight={[0, 0, 4]}>
-            <Collapsible content={description} />
-          </Box>
-          
-          <Box sx={{ display: 'flex', marginTop: 4 }}>
-            <Box mr={6}>
-              <Title>
-                License
-              </Title>
-              <Typography>
-                { license }
-              </Typography>
-            </Box>
-
-            <Box>
-              <Title>
-                Library
-              </Title>
-              <Typography>
-                { parseScriptType(scriptJSON) }
-              </Typography>
-            </Box>
-          </Box>
-        </Grid>
-
-        <Grid item md={5} sm={12} xs={12}>
-          <Box display="flex" mb={4}>
-            
-            {
-              website && (
+          <Grid item md={5} sm={12} xs={12}>
+            <Box display='flex' mb={4}>
+              {false && (
                 <Button
                   endIcon={<ArrowForwardIcon />}
                   sx={{ textTransform: 'none', marginRight: 4 }}
@@ -204,71 +198,70 @@ const ProjectDetails = ({ id }: Props) => {
                 >
                   Artist link
                 </Button>
-              )
-            }
-          </Box>
-            
-        </Grid>
-      </Grid>
-
-      <Divider />
-
-      <Box px={1}>
-        <Box mt={4} mb={4} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="h4">{ invocations} Item{ Number(invocations) === 1 ? '' : 's' }</Typography>
-
-          
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Box>
-              <FormControl fullWidth>
-                <InputLabel variant="standard" htmlFor="uncontrolled-native">
-                  Sort
-                </InputLabel>
-                <NativeSelect
-                  value={orderDirection}
-                  sx={{ fontSize: '14px' }}
-                  onChange={(e) => {
-                    setCurrentPage(0);
-                    setOrderDirection(e.target.value as OrderDirection)
-                  }}
-                >
-                  <option value={OrderDirection.DESC}>Latest</option>
-                  <option value={OrderDirection.ASC}>Earliest</option>
-                </NativeSelect>
-              </FormControl>
+              )}
             </Box>
-                  
-            <Typography fontSize="14px" pt={2} ml={3}>
-              Showing  { Math.min(invocations, tokensPerPage) }
+          </Grid>
+        </Grid>
+
+        <Divider />
+
+        {/* <Box px={1}>
+          <Box mt={4} mb={4} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant='h4'>
+              {invocations} Item{Number(invocations) === 1 ? '' : 's'}
             </Typography>
+
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box>
+                <FormControl fullWidth>
+                  <InputLabel variant='standard' htmlFor='uncontrolled-native'>
+                    Sort
+                  </InputLabel>
+                  <NativeSelect
+                    value={orderDirection}
+                    sx={{ fontSize: '14px' }}
+                    onChange={(e) => {
+                      setCurrentPage(0);
+                      setOrderDirection(e.target.value as OrderDirection);
+                    }}
+                  >
+                    <option value={OrderDirection.DESC}>Latest</option>
+                    <option value={OrderDirection.ASC}>Earliest</option>
+                  </NativeSelect>
+                </FormControl>
+              </Box>
+
+              <Typography fontSize='14px' pt={2} ml={3}>
+                Showing {Math.min(invocations, tokensPerPage)}
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-      
-        <TokenList
-          projectId={id}
-          first={tokensPerPage}
-          skip={currentPage*tokensPerPage}
-          orderDirection={orderDirection}
-          aspectRatio={parseAspectRatio(scriptJSON)}
-        />
 
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Stack mt={6} mb={8} spacing={2}>
-            <Pagination
-              count={Math.ceil(invocations/tokensPerPage)}
-              color="primary"
-              page={currentPage + 1}
-              onChange={(event, page) => {
-                window.scrollTo(0, 0);
-                setCurrentPage(page - 1);
-              }}
-            />
-          </Stack>
-        </Box>
+          <TokenList
+            projectId={id}
+            first={tokensPerPage}
+            skip={currentPage * tokensPerPage}
+            orderDirection={orderDirection}
+            aspectRatio={parseAspectRatio(scriptJSON)}
+          />
 
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Stack mt={6} mb={8} spacing={2}>
+              <Pagination
+                count={Math.ceil(invocations / tokensPerPage)}
+                color='primary'
+                page={currentPage + 1}
+                onChange={(event, page) => {
+                  window.scrollTo(0, 0);
+                  setCurrentPage(page - 1);
+                }}
+              />
+            </Stack>
+          </Box>
+        </Box> */}
       </Box>
-    </Box>
-  )
+    )
+  );
 }
 
 export default ProjectDetails;

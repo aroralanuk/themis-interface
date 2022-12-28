@@ -4,6 +4,9 @@ import moment from 'moment';
 import { useWeb3React } from '@web3-react/core';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import InputAdornment from '@mui/material/InputAdornment';
+import OutlinedInput from '@mui/material/OutlinedInput';
 import Alert from '@mui/material/Alert';
 import { ERC20Token, Project } from 'utils/types';
 import { CHAINS } from 'utils/chains';
@@ -52,7 +55,7 @@ const PurchaseProject = ({ project }:Props) => {
 
   const mint = () => {
     if (!provider || !mintContractAddress) {
-      return; 
+      return;
     }
     notifyTx({
       method: mintAction,
@@ -67,7 +70,7 @@ const PurchaseProject = ({ project }:Props) => {
       },
       onSubmitted: () => setPending(true),
       onError: () => setPending(false),
-    }); 
+    });
   }
 
   if (!project) {
@@ -98,9 +101,9 @@ const PurchaseProject = ({ project }:Props) => {
     return <Alert severity="info">Project is not active</Alert>
   }
 
-  if (project.complete) {
-    return <Alert severity="info">Sold out</Alert>
-  }
+  // if (project.complete) {
+  //   return <Alert severity="info">Sold out</Alert>
+  // }
 
   if (!isActive) {
     return (
@@ -130,16 +133,29 @@ const PurchaseProject = ({ project }:Props) => {
       symbol: project.currencySymbol,
     }
   }
-  
-  const Mint = () => (
-    <Button
-      variant="contained"
-      color="primary"
-      onClick={mint}
 
+  const Mint = () => (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        marginTop: 2.5,
+        marginBottom: 2.5,
+      }}
     >
-      Purchase a mint { utils.formatEther(weiPrice) } { project.currencySymbol }
-    </Button>
+      <OutlinedInput
+        id='outlined-adornment-weight'
+        sx = {{ marginRight: 2 }}
+        endAdornment={<InputAdornment position='end'>USDC</InputAdornment>}
+        aria-describedby='outlined-weight-helper-text'
+        inputProps={{
+          'aria-label': 'weight',
+        }}
+      />
+      <Button variant='contained' color='primary' onClick={mint}>
+        Commit bid anonymously
+      </Button>
+    </Box>
   );
 
   const ApproveAndMint = () => {

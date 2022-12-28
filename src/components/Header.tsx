@@ -65,7 +65,7 @@ const Header = () => {
             >
               <MenuIcon />
             </IconButton>
-            <Link href="/" underline="hover" sx={{
+            <Link href="/project/362" underline="hover" sx={{
               color: 'white',
             }}>
               <Typography variant="h6" color="inherit" mr={3} noWrap>
@@ -73,13 +73,13 @@ const Header = () => {
               </Typography>
             </Link>
 
-            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+            {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               {navItems.map((item) => (
                 <Link key={item.label} href={item.url} sx={{ color: 'white' }}>
                   { item.label }
                 </Link>
               ))}
-            </Box>
+            </Box> */}
           </Box>
 
           <ConnectWallet />

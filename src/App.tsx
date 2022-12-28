@@ -12,16 +12,17 @@ function App() {
     <AppProviders>
       <Router>
         <Routes>
-          <Route index element={<HomePage />} />
-          <Route path="projects" element={<ProjectsPage />} />
-          <Route path="project/:projectId" element={<ProjectPage />} />
-          <Route path="token/:id" element={<TokenPage />} />
+          <Route index element={<ProjectPage />} />
+          <Route path='project/362' element={<ProjectPage />} />
+          {/* <Route path='projects' element={<ProjectsPage />} /> */}
+          <Route path='project/:projectId' element={<ProjectPage />} />
+          {/* <Route path='token/:id' element={<TokenPage />} /> */}
         </Routes>
       </Router>
       <ToastContainer
         autoClose={10000}
-        position="bottom-right"
-        theme="light"
+        position='bottom-right'
+        theme='light'
         newestOnTop
         pauseOnHover
         pauseOnFocusLoss

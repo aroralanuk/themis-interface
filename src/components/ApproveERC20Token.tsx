@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useWeb3React } from '@web3-react/core';
+import { useSigner } from 'wagmi';
 import { useQueryClient } from 'react-query';
 import { BigNumber } from 'ethers';
 import Box from '@mui/material/Box';
@@ -35,7 +35,7 @@ const ApproveERC20 = ({
     spendingContractAddress,
     chainId,
   );
-  const { account } = useWeb3React();
+  const { data: account, isError, isLoading } = useSigner();
   const queryClient = useQueryClient();
   const [pending, setPending] = useState(false);
 

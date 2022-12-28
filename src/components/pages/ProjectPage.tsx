@@ -5,7 +5,9 @@ import { useParams } from 'react-router-dom';
 import { coreContractAddress } from 'config';
 
 const ProjectPage = () => {
-  const { projectId } = useParams();
+  // const { projectId } = useParams();
+  // todo: only for testing
+  const projectId = 362;
 
   return (
     <Page>

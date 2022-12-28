@@ -3,6 +3,19 @@ import {
   gql
 } from '@apollo/client';
 
+const testQuery = (id: string) => `
+  query GetProject {
+    project (
+      id: "${id.toLowerCase()}"
+    ) {
+      id
+      mintActive
+      owner
+      auctionStart
+      bidDeadline
+      revealDeadline
+    }`;
+
 const projectQuery = (id: string) => `
   query GetProject {
     project(
@@ -44,8 +57,10 @@ const projectQuery = (id: string) => `
   }`;
 
 const useProject = (id: string) => {
+  console.log('useProject', id);
   const { loading, error, data } = useQuery(gql(projectQuery(id)));
 
+  console.log(data);
   return {
     loading,
     error,

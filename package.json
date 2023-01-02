@@ -42,6 +42,7 @@
     "wagmi": "^0.10.0"
   },
   "scripts": {
+    "generate-types": "typechain --target=ethers-v5 --out-dir src/contracts 'src/abis/*.json'",
     "start": "GENERATE_SOURCEMAP=false react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

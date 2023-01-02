@@ -11,11 +11,11 @@ import Alert from '@mui/material/Alert';
 import { ERC20Token, Project } from 'utils/types';
 import { CHAINS } from 'utils/chains';
 import { notifyTx } from 'utils/notifications';
-import { GenArt721Minter__factory } from 'contracts';
+import { GenArt721Minter__factory, ThemisController__factory } from 'contracts';
 import MintSuccessDialog from './MintSuccessDialog';
 import RequiresBalance from './RequiresBalance';
 import ApproveERC20Token from './ApproveERC20Token';
-import { expectedChainId, mintContractAddress } from 'config';
+import { expectedChainId, mintContractAddress, controllerAddress } from 'config';
 
 interface Props {
   project: Project;
@@ -52,6 +52,16 @@ const PurchaseProject = ({ project }:Props) => {
     }
     return Promise.reject(new Error('Mint contract or provider not properly configured'));
   }
+
+  const commitBidAction = async () => {
+    if (provider && controllerAddress) {
+      const signer = provider.getSigner(account);
+      const controller = ThemisController__factory.connect(controllerAddress, signer);
+
+      const vaultAddress = await controller.getVaultAddress();
+    }
+    return Promise.reject(new Error('Controller contract or provider not properly configured'));
+  };
 
   const mint = () => {
     if (!provider || !mintContractAddress) {

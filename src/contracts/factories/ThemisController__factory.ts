@@ -591,6 +591,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "collateralToken",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint32",
@@ -639,16 +652,6 @@ const _abi = [
   },
   {
     inputs: [
-      {
-        internalType: "bytes32",
-        name: "auction_",
-        type: "bytes32",
-      },
-      {
-        internalType: "address",
-        name: "collateralToken_",
-        type: "address",
-      },
       {
         internalType: "address",
         name: "bidder_",

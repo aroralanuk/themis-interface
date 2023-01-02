@@ -11,11 +11,12 @@ import Alert from '@mui/material/Alert';
 import { ERC20Token, Project } from 'utils/types';
 import { CHAINS } from 'utils/chains';
 import { notifyTx } from 'utils/notifications';
-import { GenArt721Minter__factory, ThemisController__factory } from 'contracts';
+import { ThemisController__factory } from 'contracts';
 import MintSuccessDialog from './MintSuccessDialog';
 import RequiresBalance from './RequiresBalance';
 import ApproveERC20Token from './ApproveERC20Token';
 import { expectedChainId, mintContractAddress, controllerAddress } from 'config';
+import { ERC20__factory } from 'contracts/factories/ERC20__factory';
 
 interface Props {
   project: Project;
@@ -28,6 +29,7 @@ const PurchaseProject = ({ project }:Props) => {
   const [pending, setPending] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [mintedTokenId, setMintedTokenId] = useState<number | null>(null);
+  const [bidAmount, setBidAmount] = useState<string>('0.1');
   const weiPrice = BigNumber.from(project.pricePerTokenInWei.toString());
 
   const connect = useCallback(() => {
@@ -39,26 +41,38 @@ const PurchaseProject = ({ project }:Props) => {
   const mintAction = async () => {
     if (provider && mintContractAddress) {
       const signer = provider.getSigner(account);
-      const abMinterContract = GenArt721Minter__factory.connect(mintContractAddress, signer);
+      // const abMinterContract = GenArt721Minter__factory.connect(mintContractAddress, signer);
 
-      const gasLimit = await abMinterContract.estimateGas.purchase(BigNumber.from(project.projectId), {
-        value: usesCustomToken ? 0 : weiPrice,
-      });
+      // const gasLimit = await abMinterContract.estimateGas.purchase(BigNumber.from(project.projectId), {
+      //   value: usesCustomToken ? 0 : weiPrice,
+      // });
 
-      return abMinterContract.purchase(BigNumber.from(project.projectId), {
-        value: usesCustomToken ? 0 : weiPrice,
-        gasLimit,
-      });
+      // return abMinterContract.purchase(BigNumber.from(project.projectId), {
+      //   value: usesCustomToken ? 0 : weiPrice,
+      //   gasLimit,
+      // });
     }
     return Promise.reject(new Error('Mint contract or provider not properly configured'));
   }
 
-  const commitBidAction = async () => {
+  const commitBidAction = async (bidAmount: any) => {
+    console.log(provider);
+    console.log(controllerAddress);
     if (provider && controllerAddress) {
       const signer = provider.getSigner(account);
+      console.log('signer', signer);
       const controller = ThemisController__factory.connect(controllerAddress, signer);
+      console.log('controller', controller);
+      const collateralToken = await controller.collateralToken();
+      console.log('collateralToken', collateralToken);
+      const token = ERC20__factory.connect(collateralToken, signer);
 
-      const vaultAddress = await controller.getVaultAddress();
+      const amount = ethers.BigNumber.from(69);
+      const salt = ethers.utils.hexZeroPad(amount.toHexString(), 32);
+      const vaultAddress = await controller.getVaultAddress(signer._address, salt);
+      console.log('vaultAddress', vaultAddress);
+
+      return token.transfer(vaultAddress, bidAmount);
     }
     return Promise.reject(new Error('Controller contract or provider not properly configured'));
   };
@@ -68,7 +82,7 @@ const PurchaseProject = ({ project }:Props) => {
       return;
     }
     notifyTx({
-      method: mintAction,
+      method: () => commitBidAction(bidAmount),
       chainId: expectedChainId,
       success: 'Your token has been minted!',
       error: 'An error occured while trying to mint.',
@@ -161,6 +175,7 @@ const PurchaseProject = ({ project }:Props) => {
         inputProps={{
           'aria-label': 'weight',
         }}
+        onChange={(e) => setBidAmount(e.target.value)}
       />
       <Button variant='contained' color='primary' onClick={mint}>
         Commit bid anonymously

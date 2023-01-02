@@ -43,9 +43,10 @@ export interface ThemisControllerInterface extends utils.Interface {
   functions: {
     "auction()": FunctionFragment;
     "bidAmounts(address)": FunctionFragment;
+    "collateralToken()": FunctionFragment;
     "connectAuction(uint32,address)": FunctionFragment;
     "deployVaultOnReveal(address,uint128,bytes32)": FunctionFragment;
-    "getVaultAddress(bytes32,address,address,bytes32)": FunctionFragment;
+    "getVaultAddress(address,bytes32)": FunctionFragment;
     "revealBid(address,bytes32,(bytes[],bytes))": FunctionFragment;
     "revealBidCallback(address,uint128,bytes32,bool)": FunctionFragment;
     "revealStartBlock()": FunctionFragment;
@@ -58,6 +59,7 @@ export interface ThemisControllerInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "auction"
       | "bidAmounts"
+      | "collateralToken"
       | "connectAuction"
       | "deployVaultOnReveal"
       | "getVaultAddress"
@@ -75,6 +77,10 @@ export interface ThemisControllerInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
+    functionFragment: "collateralToken",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "connectAuction",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
   ): string;
@@ -88,12 +94,7 @@ export interface ThemisControllerInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getVaultAddress",
-    values: [
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BytesLike>
-    ]
+    values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "revealBid",
@@ -131,6 +132,10 @@ export interface ThemisControllerInterface extends utils.Interface {
 
   decodeFunctionResult(functionFragment: "auction", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bidAmounts", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "collateralToken",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "connectAuction",
     data: BytesLike
@@ -356,6 +361,8 @@ export interface ThemisController extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    collateralToken(overrides?: CallOverrides): Promise<[string]>;
+
     connectAuction(
       domain_: PromiseOrValue<BigNumberish>,
       contract_: PromiseOrValue<string>,
@@ -370,8 +377,6 @@ export interface ThemisController extends BaseContract {
     ): Promise<ContractTransaction>;
 
     getVaultAddress(
-      auction_: PromiseOrValue<BytesLike>,
-      collateralToken_: PromiseOrValue<string>,
       bidder_: PromiseOrValue<string>,
       salt_: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -413,6 +418,8 @@ export interface ThemisController extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  collateralToken(overrides?: CallOverrides): Promise<string>;
+
   connectAuction(
     domain_: PromiseOrValue<BigNumberish>,
     contract_: PromiseOrValue<string>,
@@ -427,8 +434,6 @@ export interface ThemisController extends BaseContract {
   ): Promise<ContractTransaction>;
 
   getVaultAddress(
-    auction_: PromiseOrValue<BytesLike>,
-    collateralToken_: PromiseOrValue<string>,
     bidder_: PromiseOrValue<string>,
     salt_: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
@@ -470,6 +475,8 @@ export interface ThemisController extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    collateralToken(overrides?: CallOverrides): Promise<string>;
+
     connectAuction(
       domain_: PromiseOrValue<BigNumberish>,
       contract_: PromiseOrValue<string>,
@@ -484,8 +491,6 @@ export interface ThemisController extends BaseContract {
     ): Promise<number>;
 
     getVaultAddress(
-      auction_: PromiseOrValue<BytesLike>,
-      collateralToken_: PromiseOrValue<string>,
       bidder_: PromiseOrValue<string>,
       salt_: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -653,6 +658,8 @@ export interface ThemisController extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    collateralToken(overrides?: CallOverrides): Promise<BigNumber>;
+
     connectAuction(
       domain_: PromiseOrValue<BigNumberish>,
       contract_: PromiseOrValue<string>,
@@ -667,8 +674,6 @@ export interface ThemisController extends BaseContract {
     ): Promise<BigNumber>;
 
     getVaultAddress(
-      auction_: PromiseOrValue<BytesLike>,
-      collateralToken_: PromiseOrValue<string>,
       bidder_: PromiseOrValue<string>,
       salt_: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -711,6 +716,8 @@ export interface ThemisController extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    collateralToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     connectAuction(
       domain_: PromiseOrValue<BigNumberish>,
       contract_: PromiseOrValue<string>,
@@ -725,8 +732,6 @@ export interface ThemisController extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     getVaultAddress(
-      auction_: PromiseOrValue<BytesLike>,
-      collateralToken_: PromiseOrValue<string>,
       bidder_: PromiseOrValue<string>,
       salt_: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides

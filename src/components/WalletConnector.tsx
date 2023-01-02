@@ -4,9 +4,11 @@ import Typography from '@mui/material/Typography';
 import ButtonBase from '@mui/material/ButtonBase';
 import { Connector } from '@web3-react/types';
 import { Web3ReactHooks } from '@web3-react/core';
+import { ConnectWithSelect } from './ConnectWithSelect';
 import { expectedChainId } from 'config';
 import { WalletConnect } from '@web3-react/walletconnect';
 import { getAddChainParameters } from 'utils/chains';
+
 
 interface Props {
   name: string;
@@ -56,8 +58,8 @@ const WalletConnector = ({ name, logo, width=100, connector, hooks, onError, onS
         }}
       >
         <img src={logo} alt={name} width={width} />
-        <Typography pb={2} fontSize={14} fontWeight={400} textAlign="center">
-          { name }
+        <Typography pb={2} fontSize={14} fontWeight={400} textAlign='center'>
+          {name}
         </Typography>
       </Box>
     </ButtonBase>

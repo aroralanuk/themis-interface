@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import ButtonBase from '@mui/material/ButtonBase';
 import { Connector } from '@web3-react/types';
 import { Web3ReactHooks } from '@web3-react/core';
-import { ConnectWithSelect } from './ConnectWithSelect';
+// import { ConnectWithSelect } from './ConnectWithSelect';
 import { expectedChainId } from 'config';
 import { WalletConnect } from '@web3-react/walletconnect';
 import { getAddChainParameters } from 'utils/chains';

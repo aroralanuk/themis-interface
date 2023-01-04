@@ -6,7 +6,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
-import OutlinedInput from '@mui/material/OutlinedInput';
+import { FormControl, OutlinedInput } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import { ERC20Token, Project } from 'utils/types';
 import { CHAINS } from 'utils/chains';
@@ -22,14 +22,15 @@ interface Props {
   project: Project;
 }
 
-const PurchaseProject = ({ project }:Props) => {
+const PurchaseProject = ({ project }: Props) => {
   const { chainId, isActive, account, connector, provider } = useWeb3React();
   const startTime = project?.minterConfiguration?.startTime && moment.unix(parseInt(project.minterConfiguration?.startTime?.toString()));
   const usesCustomToken = project?.currencyAddress !== ethers.constants.AddressZero;
   const [pending, setPending] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [mintedTokenId, setMintedTokenId] = useState<number | null>(null);
-  const [bidAmount, setBidAmount] = useState<string>('0.1');
+  const [bidAmount, setBidAmount] = useState<string>('500000');
+  const [bidSubmitted, setBidSubmitted] = useState(false);
   const weiPrice = BigNumber.from(project.pricePerTokenInWei.toString());
 
   const connect = useCallback(() => {
@@ -60,19 +61,26 @@ const PurchaseProject = ({ project }:Props) => {
     console.log(controllerAddress);
     if (provider && controllerAddress) {
       const signer = provider.getSigner(account);
+
       console.log('signer', signer);
+      console.log('controllerAddress', controllerAddress);
       const controller = ThemisController__factory.connect(controllerAddress, signer);
       console.log('controller', controller);
       const collateralToken = await controller.collateralToken();
       console.log('collateralToken', collateralToken);
       const token = ERC20__factory.connect(collateralToken, signer);
 
-      const amount = ethers.BigNumber.from(69);
-      const salt = ethers.utils.hexZeroPad(amount.toHexString(), 32);
+      const saltNum = ethers.BigNumber.from(69);
+      const salt = ethers.utils.hexZeroPad(saltNum.toHexString(), 32);
       const vaultAddress = await controller.getVaultAddress(signer._address, salt);
       console.log('vaultAddress', vaultAddress);
 
-      return token.transfer(vaultAddress, bidAmount);
+      const amount = BigNumber.from(bidAmount).mul(10 ** 6);
+      console.log('bidAmount', amount);
+
+      console.log("token amount: ", BigNumber.from(bidAmount).toNumber() / (10 ** 6));
+
+      return token.transfer(vaultAddress, amount, { gasLimit: 1000000 });
     }
     return Promise.reject(new Error('Controller contract or provider not properly configured'));
   };
@@ -84,13 +92,15 @@ const PurchaseProject = ({ project }:Props) => {
     notifyTx({
       method: () => commitBidAction(bidAmount),
       chainId: expectedChainId,
-      success: 'Your token has been minted!',
-      error: 'An error occured while trying to mint.',
-      onSuccess: (receipt:any) => {
+      success: 'Your bid was commited privately',
+      error: 'An error occured while commit bid',
+      onSuccess: (receipt: any) => {
+        console.log('receipt', receipt);
         const tokenId = parseInt(receipt?.events[0]?.topics[3], 16);
         setMintedTokenId(tokenId);
         setPending(false);
         setSuccessOpen(true);
+        setBidSubmitted(true);
       },
       onSubmitted: () => setPending(true),
       onError: () => setPending(false),
@@ -144,7 +154,7 @@ const PurchaseProject = ({ project }:Props) => {
   if (chainId !== expectedChainId) {
     return (
       <Alert severity="warning">
-        Switch to { CHAINS[expectedChainId]?.name } to purchase
+        Switch to {CHAINS[expectedChainId]?.name} to purchase
       </Alert>
     );
   }
@@ -158,6 +168,20 @@ const PurchaseProject = ({ project }:Props) => {
     }
   }
 
+  const BidButton = () => {
+    if (bidSubmitted) {
+      return <Button variant='contained' color='primary' onClick={mint}>
+        Update bid
+      </Button>
+    } else {
+      return <Button variant='contained' color='primary' onClick={mint}>
+        Commit bid anonymously
+      </Button>;
+    }
+
+  }
+
+
   const Mint = () => (
     <Box
       sx={{
@@ -167,19 +191,19 @@ const PurchaseProject = ({ project }:Props) => {
         marginBottom: 2.5,
       }}
     >
-      <OutlinedInput
-        id='outlined-adornment-weight'
-        sx = {{ marginRight: 2 }}
-        endAdornment={<InputAdornment position='end'>USDC</InputAdornment>}
-        aria-describedby='outlined-weight-helper-text'
-        inputProps={{
-          'aria-label': 'weight',
-        }}
-        onChange={(e) => setBidAmount(e.target.value)}
-      />
-      <Button variant='contained' color='primary' onClick={mint}>
-        Commit bid anonymously
-      </Button>
+      <FormControl sx={{ marginRight: 1, width: '25ch' }} variant='outlined'>
+        <OutlinedInput
+          type='number'
+          id='outlined-adornment-weight'
+          endAdornment={<InputAdornment position='end'>USDC</InputAdornment>}
+          aria-describedby='outlined-weight-helper-text'
+          inputProps={{
+            'aria-label': 'weight',
+          }}
+          // onChange={(e) => setBidAmount(e.target.value)}
+        />
+      </FormControl>
+      <BidButton />
     </Box>
   );
 

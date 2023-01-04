@@ -15,6 +15,7 @@ import Link from '@mui/material/Link';
 import Button from '@mui/material/Button';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import useProject from 'hooks/useProject';
+import { useProject2 } from 'hooks/useProject2';
 import { useWindowSize } from 'hooks/useWindowSize';
 import useTheme from '@mui/material/styles/useTheme';
 import TokenPreview from './TokenPreview';
@@ -27,6 +28,7 @@ import { parseScriptType, parseAspectRatio } from 'utils/scriptJSON';
 import { OrderDirection } from 'utils/types';
 import Collapsible from './Collapsible';
 import Timer from './Timer';
+import { graphQLURL, goerliGraphURL } from 'config';
 
 interface Props {
   id: string;
@@ -47,6 +49,9 @@ const Title = ({ children }: TitleProps) => (
 );
 
 const ProjectDetails = ({ id }: Props) => {
+  const { loading2, error2, data2 } = useProject2('0x53f04da5b767ef535b8e84413c4f4316dfea1524');
+  console.log('goerli graph url: ', goerliGraphURL);
+  console.log('mumbai graph url: ', graphQLURL);
   const { loading, error, data } = useProject(id);
   const [currentPage, setCurrentPage] = useState(0);
   const [orderDirection, setOrderDirection] = useState(OrderDirection.ASC);
@@ -70,7 +75,8 @@ const ProjectDetails = ({ id }: Props) => {
   }
 
   const project = data?.project;
-  console.log(project);
+  const project2 = data2?.project;
+
   const token = project?.tokens[0];
   const width = size.width > theme.breakpoints.values.md
     ? (Math.min(size.width, 1200)- 48)*0.666666
@@ -90,6 +96,20 @@ const ProjectDetails = ({ id }: Props) => {
     maxInvocations,
     scriptJSON,
   } = project;
+
+  const {
+    bidDeadline,
+    revealDeadline
+  } = project2;
+
+  const bidEnd:Date = new Date(Number(bidDeadline) * 1000);
+  const revealEnd = new Date(Number(revealDeadline) * 1000);
+
+  console.log('bidEnd: ', typeof bidEnd);
+
+  const isRevealPeriod = new Date() > bidEnd && new Date() < revealEnd;
+
+  console.log('isRevealPeriod: ', isRevealPeriod);
 
   const des =
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
@@ -159,7 +179,7 @@ const ProjectDetails = ({ id }: Props) => {
                 />
                 <Box sx={{ fontSize: 12 }}>{Math.floor((invocations / maxInvocations) * 100)} %</Box>
               </Box>
-
+              {/* {isRevealPeriod && <RevealBid project={project2} />} */}
               <PurchaseProject project={project} />
             </Box>
           </Grid>

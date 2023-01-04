@@ -17,9 +17,11 @@ import {
   ApolloClient,
   InMemoryCache,
   ApolloProvider,
+  HttpLink,
+  ApolloLink,
 } from '@apollo/client';
 import theme from 'theme';
-import { graphQLURL } from 'config';
+import { graphQLURL, goerliGraphURL } from 'config';
 
 const queryClient = new QueryClient();
 
@@ -29,8 +31,21 @@ const connectors: [MetaMask | WalletConnect | CoinbaseWallet, Web3ReactHooks][] 
   [coinbaseWallet, coinbaseWalletHooks],
 ]
 
-const client = new ApolloClient({
+const mumbaiLink = new HttpLink({
   uri: graphQLURL,
+});
+
+const goerliLink = new HttpLink({
+  uri: goerliGraphURL,
+});
+
+const client = new ApolloClient({
+  link: ApolloLink.split(
+    operation => operation.getContext().clientName === 'mumbai',
+    mumbaiLink,
+    goerliLink
+  ),
+
   cache: new InMemoryCache(),
 });
 

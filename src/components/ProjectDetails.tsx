@@ -1,9 +1,5 @@
 import { useState } from 'react';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
-import Divider from '@mui/material/Divider';
+import { Alert, Box, Divider, Grid, Typography } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Stack from '@mui/material/Stack';
@@ -23,12 +19,12 @@ import ProjectStats from './ProjectStats';
 import Loading from './Loading';
 import TokenList from './TokenList';
 import PurchaseProject from './PurchaseProject';
-import { tokensPerPage } from 'config';
+import RevealBid from './RevealBid';
 import { parseScriptType, parseAspectRatio } from 'utils/scriptJSON';
 import { OrderDirection } from 'utils/types';
 import Collapsible from './Collapsible';
 import Timer from './Timer';
-import { graphQLURL, goerliGraphURL } from 'config';
+import { graphQLURL, goerliGraphURL, tokensPerPage } from 'config';
 
 interface Props {
   id: string;
@@ -105,11 +101,11 @@ const ProjectDetails = ({ id }: Props) => {
   const bidEnd:Date = new Date(Number(bidDeadline) * 1000);
   const revealEnd = new Date(Number(revealDeadline) * 1000);
 
-  console.log('bidEnd: ', typeof bidEnd);
+  // const isBidPeriod = new Date() < bidEnd;
+  // const isRevealPeriod = new Date() > bidEnd && new Date() < revealEnd;
 
-  const isRevealPeriod = new Date() > bidEnd && new Date() < revealEnd;
-
-  console.log('isRevealPeriod: ', isRevealPeriod);
+  const isBidPeriod = false;
+  const isRevealPeriod = true;
 
   const des =
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
@@ -179,8 +175,8 @@ const ProjectDetails = ({ id }: Props) => {
                 />
                 <Box sx={{ fontSize: 12 }}>{Math.floor((invocations / maxInvocations) * 100)} %</Box>
               </Box>
-              {/* {isRevealPeriod && <RevealBid project={project2} />} */}
-              <PurchaseProject project={project} />
+              {isRevealPeriod && <RevealBid project={project2} isRevealPeriod/>}
+              {isBidPeriod && <PurchaseProject project={project} />}
             </Box>
           </Grid>
         </Grid>

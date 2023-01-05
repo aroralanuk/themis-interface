@@ -184,6 +184,7 @@ const PurchaseProject = ({ project }: Props) => {
 
   const Mint = () => (
     <Box
+      component='form'
       sx={{
         display: 'flex',
         flexDirection: 'row',
@@ -194,6 +195,7 @@ const PurchaseProject = ({ project }: Props) => {
       <FormControl sx={{ marginRight: 1, width: '25ch' }} variant='outlined'>
         <OutlinedInput
           type='number'
+          // label='Amount'
           id='outlined-adornment-weight'
           endAdornment={<InputAdornment position='end'>USDC</InputAdornment>}
           aria-describedby='outlined-weight-helper-text'

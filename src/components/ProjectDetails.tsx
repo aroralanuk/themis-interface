@@ -101,6 +101,9 @@ const ProjectDetails = ({ id }: Props) => {
   const bidEnd:Date = new Date(Number(bidDeadline) * 1000);
   const revealEnd = new Date(Number(revealDeadline) * 1000);
 
+  console.log('bidEnd: ', bidEnd);
+  console.log('revealEnd: ', revealEnd);
+
   // const isBidPeriod = new Date() < bidEnd;
   // const isRevealPeriod = new Date() > bidEnd && new Date() < revealEnd;
 

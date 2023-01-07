@@ -29,7 +29,7 @@ const PurchaseProject = ({ project }: Props) => {
   const [pending, setPending] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [mintedTokenId, setMintedTokenId] = useState<number | null>(null);
-  const [bidAmount, setBidAmount] = useState<string>('500000');
+  const [bidAmount, setBidAmount] = useState<string>('1');
   const [bidSubmitted, setBidSubmitted] = useState(false);
   const weiPrice = BigNumber.from(project.pricePerTokenInWei.toString());
 
@@ -38,23 +38,6 @@ const PurchaseProject = ({ project }: Props) => {
       connector.activate();
     }
   }, [connector]);
-
-  const mintAction = async () => {
-    if (provider && mintContractAddress) {
-      const signer = provider.getSigner(account);
-      // const abMinterContract = GenArt721Minter__factory.connect(mintContractAddress, signer);
-
-      // const gasLimit = await abMinterContract.estimateGas.purchase(BigNumber.from(project.projectId), {
-      //   value: usesCustomToken ? 0 : weiPrice,
-      // });
-
-      // return abMinterContract.purchase(BigNumber.from(project.projectId), {
-      //   value: usesCustomToken ? 0 : weiPrice,
-      //   gasLimit,
-      // });
-    }
-    return Promise.reject(new Error('Mint contract or provider not properly configured'));
-  }
 
   const commitBidAction = async (bidAmount: any) => {
     console.log(provider);
@@ -79,6 +62,7 @@ const PurchaseProject = ({ project }: Props) => {
       console.log('bidAmount', amount);
 
       console.log("token amount: ", BigNumber.from(bidAmount).toNumber() / (10 ** 6));
+
 
       return token.transfer(vaultAddress, amount, { gasLimit: 1000000 });
     }

@@ -7,6 +7,7 @@ import { notifyTx } from 'utils/notifications';
 import { useWeb3React } from '@web3-react/core';
 import { expectedChainId, controllerAddress } from 'config';
 import { ThemisController__factory } from 'contracts';
+import { ThemisController } from 'contracts';
 import { ethers, utils, BigNumber } from 'ethers';
 
 interface Props {
@@ -14,10 +15,13 @@ interface Props {
     isRevealPeriod: boolean;
 }
 
+
 const RevealBid = ({project, isRevealPeriod}: Props) => {
   const { chainId, isActive, account, connector, provider } = useWeb3React();
   const [pending, setPending] = useState(false);
   const [salt, setSalt] = useState<string>('345678');
+
+  const accountMerkleProof = [ethers.utils.hexlify('0x000001'), ethers.utils.hexlify('0x000002'),];
 
   const revealBidAction = async (salt: any) => {
     if (provider && controllerAddress) {
@@ -29,7 +33,10 @@ const RevealBid = ({project, isRevealPeriod}: Props) => {
       const _salt = ethers.utils.hexZeroPad(_saltNum.toHexString(), 32);
 
       // TODO: get proof
-      let proof: any;
+      let proof: ThemisController.CollateralizationProofStruct = {
+        accountMerkleProof: accountMerkleProof,
+        blockHeaderRLP: ethers.utils.hexlify("0x00000000")
+      };
 
       const gasLimit = await controllerContract.estimateGas.revealBid(
         signer._address,

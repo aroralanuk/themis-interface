@@ -37,6 +37,8 @@ const TokenList = ({
     return <Loading />
   }
 
+  console.log("TOKEN LIST: ", projectId);
+
   if (error) {
     return (
       <Alert severity="error">
@@ -56,33 +58,28 @@ const TokenList = ({
   }
 
   return (
-    data && data.tokens && (
-      data.tokens.length > 0 ? (
-        <Grid spacing={2} container>
-          {
-            data.tokens.map(((token:Token) => (
-              <Grid key={token.tokenId} item md={4} sm={12} xs={12}>
-                <Link href={`/token/${token.id}`}>
-                  <TokenImage
-                    tokenId={token.tokenId}
-                    aspectRatio={aspectRatio}
-                    width={width}
-                  />
-                </Link>
-                <Typography mt={2} fontWeight="bold">
-                  # {token.invocation.toString()}
-                </Typography>
-              </Grid>
-            )))
-          }
-        </Grid>
-      ): (
-        <Alert severity="info">
-          No tokens found for this project.
-        </Alert>
-      )
-    )
-  )
+    data &&
+    data.tokens &&
+    (data.tokens.length > 0 ? (
+      <Grid spacing={2} container>
+        {data.tokens.map((token: Token) => (
+          <Grid key={token.tokenId} item md={4} sm={12} xs={12}>
+            <Typography mt={2}>Your position</Typography>
+            <Link href={`/token/${token.id}`}>
+              <TokenImage tokenId={token.tokenId} aspectRatio={aspectRatio} width={width} />
+            </Link>
+            <Typography mt={2} fontWeight='bold'>
+              Ranking #{token.invocation.toString()}
+            </Typography>
+            <Typography mt={2}>Address 0x5486..3 Link</Typography>
+            <Typography mt={2}>125 USDC</Typography>
+          </Grid>
+        ))}
+      </Grid>
+    ) : (
+      <Alert severity='info'>No tokens found for this project.</Alert>
+    ))
+  );
 }
 
 export default TokenList;

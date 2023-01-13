@@ -31,6 +31,8 @@ const TokenPreview = ({
 }: Props) => {
   const height = width / aspectRatio;
 
+  console.log('generator image: ', `${generatorUrl}/${coreContractAddress?.toLowerCase()}/${tokenId}`);
+
   return (
     <Box>
       <Card>
@@ -82,7 +84,7 @@ const TokenPreview = ({
             )
           }
           {
-            showImageLink && ( 
+            showImageLink && (
               <Button
                 startIcon={<ImageIcon  sx={{ color: '#666'}} />}
                 sx={{

@@ -25,6 +25,7 @@ const RevealBid = ({project, isRevealPeriod}: Props) => {
 
   const revealBidAction = async (salt: any) => {
     if (provider && controllerAddress) {
+      console.log("revealBid - controller address: ", controllerAddress);
       const signer = provider.getSigner(account);
 
       const controllerContract = ThemisController__factory.connect(controllerAddress, signer);

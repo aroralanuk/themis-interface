@@ -40,17 +40,11 @@ const PurchaseProject = ({ project }: Props) => {
   }, [connector]);
 
   const commitBidAction = async (bidAmount: any) => {
-    console.log(provider);
-    console.log(controllerAddress);
     if (provider && controllerAddress) {
       const signer = provider.getSigner(account);
 
-      console.log('signer', signer);
-      console.log('controllerAddress', controllerAddress);
       const controller = ThemisController__factory.connect(controllerAddress, signer);
-      console.log('controller', controller);
       const collateralToken = await controller.collateralToken();
-      console.log('collateralToken', collateralToken);
       const token = ERC20__factory.connect(collateralToken, signer);
 
       const saltNum = ethers.BigNumber.from(69);
@@ -60,9 +54,6 @@ const PurchaseProject = ({ project }: Props) => {
 
       const amount = BigNumber.from(bidAmount).mul(10 ** 6);
       console.log('bidAmount', amount);
-
-      console.log("token amount: ", BigNumber.from(bidAmount).toNumber() / (10 ** 6));
-
 
       return token.transfer(vaultAddress, amount, { gasLimit: 1000000 });
     }

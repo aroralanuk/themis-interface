@@ -46,8 +46,6 @@ const Title = ({ children }: TitleProps) => (
 
 const ProjectDetails = ({ id }: Props) => {
   const { loading2, error2, data2 } = useProject2('0x53f04da5b767ef535b8e84413c4f4316dfea1524');
-  console.log('goerli graph url: ', goerliGraphURL);
-  console.log('mumbai graph url: ', graphQLURL);
   const { loading, error, data } = useProject(id);
   const [currentPage, setCurrentPage] = useState(0);
   const [orderDirection, setOrderDirection] = useState(OrderDirection.ASC);
@@ -101,13 +99,10 @@ const ProjectDetails = ({ id }: Props) => {
   const bidEnd:Date = new Date(Number(bidDeadline) * 1000);
   const revealEnd = new Date(Number(revealDeadline) * 1000);
 
-  console.log('bidEnd: ', bidEnd);
-  console.log('revealEnd: ', revealEnd);
-
   // const isBidPeriod = new Date() < bidEnd;
   // const isRevealPeriod = new Date() > bidEnd && new Date() < revealEnd;
 
-  const isBidPeriod = false;
+  const isBidPeriod = true;
   const isRevealPeriod = true;
 
   const des =
@@ -178,7 +173,7 @@ const ProjectDetails = ({ id }: Props) => {
                 />
                 <Box sx={{ fontSize: 12 }}>{Math.floor((invocations / maxInvocations) * 100)} %</Box>
               </Box>
-              {isRevealPeriod && <RevealBid project={project2} isRevealPeriod/>}
+              {isRevealPeriod && <RevealBid project={project2} isRevealPeriod />}
               {isBidPeriod && <PurchaseProject project={project} />}
             </Box>
           </Grid>
@@ -224,10 +219,10 @@ const ProjectDetails = ({ id }: Props) => {
 
         <Divider />
 
-        {/* <Box px={1}>
+        <Box px={1}>
           <Box mt={4} mb={4} sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant='h4'>
-              {invocations} Item{Number(invocations) === 1 ? '' : 's'}
+              Showing {invocations} / {maxInvocations} bid{Number(invocations) === 1 ? '' : 's'}
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -277,7 +272,7 @@ const ProjectDetails = ({ id }: Props) => {
               />
             </Stack>
           </Box>
-        </Box> */}
+        </Box>
       </Box>
     )
   );

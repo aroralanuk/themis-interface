@@ -154,7 +154,7 @@ const ProjectDetails = ({ id }: Props) => {
               <Typography variant='h6' mt={3}>
                 Bid deadline
               </Typography>
-              {isBidPeriod && <Timer deadline={bidEnd.toTimeString()} />}
+              {isBidPeriod || <Timer deadline={bidEnd.toTimeString()} />}
               {isRevealPeriod && <Timer deadline={revealEnd.toTimeString()} />}
 
               <Box sx={{ fontWeight: 'bold' }}>
@@ -176,8 +176,8 @@ const ProjectDetails = ({ id }: Props) => {
                 />
                 <Box sx={{ fontSize: 12 }}>{Math.floor((invocations / maxInvocations) * 100)} %</Box>
               </Box>
-              {isRevealPeriod && <RevealBid project={project2} isRevealPeriod />}
-              {isBidPeriod && <PurchaseProject project={project} />}
+              {isRevealPeriod || <RevealBid project={project2} isRevealPeriod />}
+              {isBidPeriod || <PurchaseProject project={project} />}
             </Box>
           </Grid>
         </Grid>

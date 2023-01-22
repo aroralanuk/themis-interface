@@ -19,12 +19,19 @@ interface Props {
 const RevealBid = ({project, isRevealPeriod}: Props) => {
   const { chainId, isActive, account, connector, provider } = useWeb3React();
   const [pending, setPending] = useState(false);
-  const [salt, setSalt] = useState<string>('345678');
+  const [salt, setSalt] = useState<string>('');
 
   const accountMerkleProof = [ethers.utils.hexlify('0x000001'), ethers.utils.hexlify('0x000002'),];
 
+  const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    const enteredName = event.target.value;
+    setSalt(enteredName);
+  };
+
   const revealBidAction = async (salt: any) => {
     if (provider && controllerAddress) {
+      console.log("revealBid - controller address: ", controllerAddress);
       const signer = provider.getSigner(account);
 
       const controllerContract = ThemisController__factory.connect(controllerAddress, signer);
@@ -49,7 +56,7 @@ const RevealBid = ({project, isRevealPeriod}: Props) => {
       console.log('proof', proof);
 
 
-      return controllerContract.revealBid(signer._address, _salt, proof, {gasLimit});
+      return controllerContract.revealBid(signer._address, _salt, proof, { gasLimit });
     }
     return Promise.reject(new Error('Controller contract or provider not properly configured'));
   }
@@ -105,6 +112,8 @@ const RevealBid = ({project, isRevealPeriod}: Props) => {
           id='outlined-required'
           label='Required'
           defaultValue={salt}
+          onChange={inputHandler}
+
         />
         <Button variant='contained' color='primary' onClick={reveal}>
           Reveal Bid

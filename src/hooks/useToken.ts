@@ -3,10 +3,10 @@ import {
   gql
 } from '@apollo/client';
 
-const tokenQuery = (id: string) => `
-  query GetToken {
+const tokenQuery = gql`
+  query GetToken($id: String) {
     token(
-      id: "${id}"
+      id: $id
     ) {
       id
       tokenId
@@ -27,7 +27,12 @@ const tokenQuery = (id: string) => `
   }`;
 
 const useToken = (id: string) => {
-  const { loading, error, data } = useQuery(gql(tokenQuery(id)));
+  console.log('useToken', id);
+
+    const { loading, error, data } = useQuery(tokenQuery, {
+      variables: { id },
+      context: { clientName: 'mumbai' },
+    });
 
   return {
     loading,

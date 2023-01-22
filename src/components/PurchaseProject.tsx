@@ -6,7 +6,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
-import { FormControl, OutlinedInput } from '@mui/material';
+import { FormControl, OutlinedInput, TextField } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import { ERC20Token, Project } from 'utils/types';
 import { CHAINS } from 'utils/chains';
@@ -17,6 +17,7 @@ import RequiresBalance from './RequiresBalance';
 import ApproveERC20Token from './ApproveERC20Token';
 import { expectedChainId, mintContractAddress, controllerAddress } from 'config';
 import { ERC20__factory } from 'contracts/factories/ERC20__factory';
+import e from 'express';
 
 interface Props {
   project: Project;
@@ -29,7 +30,8 @@ const PurchaseProject = ({ project }: Props) => {
   const [pending, setPending] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [mintedTokenId, setMintedTokenId] = useState<number | null>(null);
-  const [bidAmount, setBidAmount] = useState<string>('1');
+  const [bidAmount, setBidAmount] = useState<string>('');
+  const [salt, setSalt] = useState('');
   const [bidSubmitted, setBidSubmitted] = useState(false);
   const weiPrice = BigNumber.from(project.pricePerTokenInWei.toString());
 
@@ -39,30 +41,28 @@ const PurchaseProject = ({ project }: Props) => {
     }
   }, [connector]);
 
+  const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // event.preventDefault();
+    // const enteredName = event.target.value;
+    setBidAmount(event.target.value);
+  };
+
   const commitBidAction = async (bidAmount: any) => {
-    console.log(provider);
-    console.log(controllerAddress);
     if (provider && controllerAddress) {
       const signer = provider.getSigner(account);
 
-      console.log('signer', signer);
-      console.log('controllerAddress', controllerAddress);
       const controller = ThemisController__factory.connect(controllerAddress, signer);
-      console.log('controller', controller);
       const collateralToken = await controller.collateralToken();
-      console.log('collateralToken', collateralToken);
       const token = ERC20__factory.connect(collateralToken, signer);
 
-      const saltNum = ethers.BigNumber.from(69);
-      const salt = ethers.utils.hexZeroPad(saltNum.toHexString(), 32);
-      const vaultAddress = await controller.getVaultAddress(signer._address, salt);
+      const saltNum = BigNumber.from(salt);
+      const saltHex = ethers.utils.hexZeroPad(saltNum.toHexString(), 32);
+      console.log('salt: ', saltHex);
+      const vaultAddress = await controller.getVaultAddress(signer._address, saltHex);
       console.log('vaultAddress', vaultAddress);
 
       const amount = BigNumber.from(bidAmount).mul(10 ** 6);
       console.log('bidAmount', amount);
-
-      console.log("token amount: ", BigNumber.from(bidAmount).toNumber() / (10 ** 6));
-
 
       return token.transfer(vaultAddress, amount, { gasLimit: 1000000 });
     }
@@ -169,6 +169,7 @@ const PurchaseProject = ({ project }: Props) => {
   const Mint = () => (
     <Box
       component='form'
+      noValidate
       sx={{
         display: 'flex',
         flexDirection: 'row',
@@ -176,19 +177,25 @@ const PurchaseProject = ({ project }: Props) => {
         marginBottom: 2.5,
       }}
     >
-      <FormControl sx={{ marginRight: 1, width: '25ch' }} variant='outlined'>
-        <OutlinedInput
-          type='number'
-          // label='Amount'
-          id='outlined-adornment-weight'
-          endAdornment={<InputAdornment position='end'>USDC</InputAdornment>}
-          aria-describedby='outlined-weight-helper-text'
-          inputProps={{
-            'aria-label': 'weight',
-          }}
-          // onChange={(e) => setBidAmount(e.target.value)}
-        />
-      </FormControl>
+      <TextField
+        sx={{ marginRight: 1, width: '25ch' }}
+        required
+        id='outlined-required'
+        label='Required'
+        defaultValue={salt}
+        onChange={(event) => setSalt(event.target.value)}
+      />
+      <TextField
+        sx={{ marginRight: 1, width: '25ch' }}
+        required
+        id='outlined-required'
+        label='Amount'
+        defaultValue={bidAmount}
+        onChange={(event) => setBidAmount(event.target.value)}
+        InputProps={{
+          endAdornment: <InputAdornment position='end'>USDC</InputAdornment>,
+        }}
+      />
       <BidButton />
     </Box>
   );

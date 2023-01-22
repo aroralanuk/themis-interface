@@ -171,7 +171,7 @@ export interface ThemisControllerInterface extends utils.Interface {
   ): Result;
 
   events: {
-    "AuctionEnded()": EventFragment;
+    "AuctionEnded(uint256)": EventFragment;
     "AuctionInitialized(address,address,uint64,uint64,uint64,uint128)": EventFragment;
     "BidFailed(uint256,address,address,uint128)": EventFragment;
     "BidProvenRemote(uint256,bytes32,address,uint256)": EventFragment;
@@ -180,7 +180,9 @@ export interface ThemisControllerInterface extends utils.Interface {
     "BidSuccessfullyPlaced(uint256,address,address,uint128)": EventFragment;
     "ReceivedToken(uint32,bytes32,string,address,uint256)": EventFragment;
     "Reserved(address,uint256)": EventFragment;
-    "RevealStarted()": EventFragment;
+    "RevealEnded(uint256)": EventFragment;
+    "RevealStarted(uint256)": EventFragment;
+    "RevealStartedController(uint256)": EventFragment;
     "VaultDeployed(bytes32,address,address)": EventFragment;
   };
 
@@ -193,12 +195,19 @@ export interface ThemisControllerInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "BidSuccessfullyPlaced"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ReceivedToken"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Reserved"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RevealEnded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RevealStarted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RevealStartedController"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "VaultDeployed"): EventFragment;
 }
 
-export interface AuctionEndedEventObject {}
-export type AuctionEndedEvent = TypedEvent<[], AuctionEndedEventObject>;
+export interface AuctionEndedEventObject {
+  timestamp: BigNumber;
+}
+export type AuctionEndedEvent = TypedEvent<
+  [BigNumber],
+  AuctionEndedEventObject
+>;
 
 export type AuctionEndedEventFilter = TypedEventFilter<AuctionEndedEvent>;
 
@@ -310,10 +319,33 @@ export type ReservedEvent = TypedEvent<
 
 export type ReservedEventFilter = TypedEventFilter<ReservedEvent>;
 
-export interface RevealStartedEventObject {}
-export type RevealStartedEvent = TypedEvent<[], RevealStartedEventObject>;
+export interface RevealEndedEventObject {
+  timestamp: BigNumber;
+}
+export type RevealEndedEvent = TypedEvent<[BigNumber], RevealEndedEventObject>;
+
+export type RevealEndedEventFilter = TypedEventFilter<RevealEndedEvent>;
+
+export interface RevealStartedEventObject {
+  timestamp: BigNumber;
+}
+export type RevealStartedEvent = TypedEvent<
+  [BigNumber],
+  RevealStartedEventObject
+>;
 
 export type RevealStartedEventFilter = TypedEventFilter<RevealStartedEvent>;
+
+export interface RevealStartedControllerEventObject {
+  timestamp: BigNumber;
+}
+export type RevealStartedControllerEvent = TypedEvent<
+  [BigNumber],
+  RevealStartedControllerEventObject
+>;
+
+export type RevealStartedControllerEventFilter =
+  TypedEventFilter<RevealStartedControllerEvent>;
 
 export interface VaultDeployedEventObject {
   auction: string;
@@ -524,8 +556,8 @@ export interface ThemisController extends BaseContract {
   };
 
   filters: {
-    "AuctionEnded()"(): AuctionEndedEventFilter;
-    AuctionEnded(): AuctionEndedEventFilter;
+    "AuctionEnded(uint256)"(timestamp?: null): AuctionEndedEventFilter;
+    AuctionEnded(timestamp?: null): AuctionEndedEventFilter;
 
     "AuctionInitialized(address,address,uint64,uint64,uint64,uint128)"(
       auction?: PromiseOrValue<string> | null,
@@ -635,8 +667,18 @@ export interface ThemisController extends BaseContract {
       id?: PromiseOrValue<BigNumberish> | null
     ): ReservedEventFilter;
 
-    "RevealStarted()"(): RevealStartedEventFilter;
-    RevealStarted(): RevealStartedEventFilter;
+    "RevealEnded(uint256)"(timestamp?: null): RevealEndedEventFilter;
+    RevealEnded(timestamp?: null): RevealEndedEventFilter;
+
+    "RevealStarted(uint256)"(timestamp?: null): RevealStartedEventFilter;
+    RevealStarted(timestamp?: null): RevealStartedEventFilter;
+
+    "RevealStartedController(uint256)"(
+      timestamp?: null
+    ): RevealStartedControllerEventFilter;
+    RevealStartedController(
+      timestamp?: null
+    ): RevealStartedControllerEventFilter;
 
     "VaultDeployed(bytes32,address,address)"(
       auction?: PromiseOrValue<BytesLike> | null,

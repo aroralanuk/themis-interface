@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import { tokensPerPage } from 'config';
 import useTokens from 'hooks/useTokens';
+import useTentativeBids from 'hooks/useTentativeBids';
 import Loading from './Loading';
 import { OrderDirection, Token } from 'utils/types';
 import { useWindowSize } from 'hooks/useWindowSize';
@@ -30,6 +31,15 @@ const TokenList = ({
     skip,
     orderDirection,
   });
+
+  const {
+    loading: loadingBids,
+    error: errorBids,
+    data: dataBids,
+  } = useTentativeBids('0xf54ddd35f3adf7d2babab6251d4481a4acba5535');
+
+  console.log("bid list: ", dataBids.bids);
+
   const size = useWindowSize();
   const theme = useTheme();
 

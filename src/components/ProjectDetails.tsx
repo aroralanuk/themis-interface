@@ -45,7 +45,7 @@ const Title = ({ children }: TitleProps) => (
 );
 
 const ProjectDetails = ({ id }: Props) => {
-  const { loading2, error2, data2 } = useProject2('0x641478def62205e64986de06998de8de5882a8a7');
+  const { loading2, error2, data2 } = useProject2('0xf54ddd35f3adf7d2babab6251d4481a4acba5535');
   const { loading, error, data } = useProject(id);
   const [currentPage, setCurrentPage] = useState(0);
   const [orderDirection, setOrderDirection] = useState(OrderDirection.ASC);

@@ -1,7 +1,4 @@
-import {
-  useQuery,
-  gql
-} from '@apollo/client';
+import { useQuery, gql } from '@apollo/client';
 import { tokensPerPage } from 'config';
 import { OrderDirection } from 'utils/types';
 
@@ -13,20 +10,13 @@ interface TokensQueryParams {
 
 const tokensQuery = gql`
   query GetTokens($projectId: ID!, $first: Int!) {
-    tokens(
-      first: $first,
-      skip: 0,
-      orderBy: createdAt orderDirection: asc,
-      where: {
-        project: $projectId
-      }
-    ) {
+    tokens(first: $first, skip: 0, orderBy: createdAt, orderDirection: asc, where: { project: $projectId }) {
       id
       tokenId
       invocation
     }
-  }`;
-
+  }
+`;
 
 const useTokens = (projectId: string, params: TokensQueryParams) => {
   const first = params?.first || tokensPerPage;
@@ -43,7 +33,7 @@ const useTokens = (projectId: string, params: TokensQueryParams) => {
     loading,
     error,
     data,
-  }
-}
+  };
+};
 
 export default useTokens;

@@ -2,7 +2,7 @@ import { toast } from 'react-toastify';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { ContractTransaction, ContractReceipt } from '@ethersproject/contracts';
-import { confirmations as numConfirmations, etherscanBaseUrl, mumbaipolyscanBaseUrl } from 'config';
+import { confirmations as numConfirmations, etherscanBaseUrl, goerliscanBaseUrl } from 'config';
 
 const displayError = (customError:any, error:any) => (
   <>
@@ -65,7 +65,7 @@ export const notifyTx = async ({
   const toastId = toast.loading(pending);
   try {
     const res = await method();
-    const txLink = `${mumbaipolyscanBaseUrl}/tx/${res.hash}`;
+    const txLink = `${goerliscanBaseUrl}tx/${res.hash}`;
     toast.update(toastId, {
       render: displayMessage(submitted, txLink),
       type: toast.TYPE.INFO,

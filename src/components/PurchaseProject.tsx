@@ -11,11 +11,11 @@ import Alert from '@mui/material/Alert';
 import { ERC20Token, Project } from 'utils/types';
 import { CHAINS } from 'utils/chains';
 import { notifyTx } from 'utils/notifications';
-import { ThemisController__factory } from 'contracts';
+import { ThemisAuction__factory } from 'contracts';
 import MintSuccessDialog from './MintSuccessDialog';
 import RequiresBalance from './RequiresBalance';
 import ApproveERC20Token from './ApproveERC20Token';
-import { expectedChainId, mintContractAddress, controllerAddress } from 'config';
+import { expectedChainId, mintContractAddress, coreAuctionAddress } from 'config';
 import { ERC20__factory } from 'contracts/factories/ERC20__factory';
 import e from 'express';
 
@@ -48,17 +48,18 @@ const PurchaseProject = ({ project }: Props) => {
   };
 
   const commitBidAction = async (bidAmount: any) => {
-    if (provider && controllerAddress) {
+    if (provider && coreAuctionAddress) {
       const signer = provider.getSigner(account);
 
-      const controller = ThemisController__factory.connect(controllerAddress, signer);
-      const collateralToken = await controller.collateralToken();
+      console.log('core contract: ', coreAuctionAddress);
+      const auction = ThemisAuction__factory.connect(coreAuctionAddress, signer);
+      const collateralToken = await auction.collateralToken();
       const token = ERC20__factory.connect(collateralToken, signer);
 
       const saltNum = BigNumber.from(salt);
       const saltHex = ethers.utils.hexZeroPad(saltNum.toHexString(), 32);
       console.log('salt: ', saltHex);
-      const vaultAddress = await controller.getVaultAddress(signer._address, saltHex);
+      const vaultAddress = await auction.getVaultAddress(auction.address, token.address, signer._address, saltHex);
       console.log('vaultAddress', vaultAddress);
 
       const amount = BigNumber.from(bidAmount).mul(10 ** 6);
@@ -66,7 +67,7 @@ const PurchaseProject = ({ project }: Props) => {
 
       return token.transfer(vaultAddress, amount, { gasLimit: 1000000 });
     }
-    return Promise.reject(new Error('Controller contract or provider not properly configured'));
+    return Promise.reject(new Error('Auction contract or provider not properly configured'));
   };
 
   const mint = () => {

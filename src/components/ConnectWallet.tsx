@@ -55,7 +55,7 @@ const ConnectWallet = () => {
 
   return (
     <Box sx={{ display: 'flex', gap: 3 }}>
-      <ChainSelect chainId={1} switchChain={() => {}} chainIds={[1]} />
+      <ChainSelect chainId={5} switchChain={() => {}} chainIds={[5]} />
       {isActive && account ? (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Address address={account} />

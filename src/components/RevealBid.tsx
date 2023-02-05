@@ -5,9 +5,9 @@ import { Alert, Box, Button, TextField } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { notifyTx } from 'utils/notifications';
 import { useWeb3React } from '@web3-react/core';
-import { expectedChainId, controllerAddress } from 'config';
-import { ThemisController__factory } from 'contracts';
-import { ThemisController } from 'contracts';
+import { expectedChainId, coreAuctionAddress } from 'config';
+import { ThemisAuction__factory } from 'contracts';
+import { ThemisAuction } from 'contracts';
 import { ethers, utils, BigNumber } from 'ethers';
 
 interface Props {
@@ -30,39 +30,34 @@ const RevealBid = ({project, isRevealPeriod}: Props) => {
   };
 
   const revealBidAction = async (salt: any) => {
-    if (provider && controllerAddress) {
-      console.log("revealBid - controller address: ", controllerAddress);
+    if (provider && coreAuctionAddress) {
+      console.log('revealBid - auction address: ', coreAuctionAddress);
       const signer = provider.getSigner(account);
 
-      const controllerContract = ThemisController__factory.connect(controllerAddress, signer);
+      const auctionContract = ThemisAuction__factory.connect(coreAuctionAddress, signer);
 
       const _saltNum = ethers.BigNumber.from(salt);
       const _salt = ethers.utils.hexZeroPad(_saltNum.toHexString(), 32);
 
       // TODO: get proof
-      let proof: ThemisController.CollateralizationProofStruct = {
+      let proof: ThemisAuction.CollateralizationProofStruct = {
         accountMerkleProof: accountMerkleProof,
-        blockHeaderRLP: ethers.utils.hexlify("0x00000000")
+        blockHeaderRLP: ethers.utils.hexlify('0x00000000'),
       };
 
-      const gasLimit = await controllerContract.estimateGas.revealBid(
-        signer._address,
-        _salt,
-        proof
-      );
+      const gasLimit = await auctionContract.estimateGas.revealBid(signer._address, _salt, 0, 0, proof);
 
       console.log('bidder', signer._address);
       console.log('salt', _salt);
       console.log('proof', proof);
 
-
-      return controllerContract.revealBid(signer._address, _salt, proof, { gasLimit });
+      return auctionContract.revealBid(signer._address, _salt, 0, 0, proof, { gasLimit });
     }
-    return Promise.reject(new Error('Controller contract or provider not properly configured'));
+    return Promise.reject(new Error('Auction contract or provider not properly configured'));
   }
 
   const reveal = () => {
-    if (!provider || !controllerAddress) {
+    if (!provider || !coreAuctionAddress) {
       return;
     }
     notifyTx({

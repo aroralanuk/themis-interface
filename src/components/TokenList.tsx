@@ -1,7 +1,9 @@
 import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
 import Link from '@mui/material/Link';
+import Box from '@mui/material/Box';
 import { tokensPerPage } from 'config';
 import useTokens from 'hooks/useTokens';
 import useTentativeBids from 'hooks/useTentativeBids';
@@ -38,7 +40,7 @@ const TokenList = ({
     data: dataBids,
   } = useTentativeBids('0xf54ddd35f3adf7d2babab6251d4481a4acba5535');
 
-  console.log("bid list: ", dataBids.bids);
+  // console.log("bid list: ", dataBids.bids);
 
   const size = useWindowSize();
   const theme = useTheme();
@@ -74,15 +76,21 @@ const TokenList = ({
       <Grid spacing={2} container>
         {data.tokens.map((token: Token) => (
           <Grid key={token.tokenId} item md={4} sm={12} xs={12}>
-            <Typography mt={2}>Your position</Typography>
-            <Link href={`/token/${token.id}`}>
-              <TokenImage tokenId={token.tokenId} aspectRatio={aspectRatio} width={width} />
-            </Link>
             <Typography mt={2} fontWeight='bold'>
               Ranking #{token.invocation.toString()}
             </Typography>
-            <Typography mt={2}>Address 0x5486..3 Link</Typography>
-            <Typography mt={2}>125 USDC</Typography>
+            <Link href={`/token/${token.id}`}>
+              <TokenImage tokenId={token.tokenId} aspectRatio={aspectRatio} width={width} />
+            </Link>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 2 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
+                <Avatar src={'https://i.pravatar.cc/300'} sx={{marginInline: 1.5}} />
+                <Link>
+                  <Typography mt={2}>0x5486..3</Typography>
+                </Link>
+              </Box>
+              <Typography mt={2}>125 USDC</Typography>
+            </Box>
           </Grid>
         ))}
       </Grid>

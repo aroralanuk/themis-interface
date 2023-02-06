@@ -9,6 +9,7 @@ import { expectedChainId, coreAuctionAddress } from 'config';
 import { ThemisAuction__factory } from 'contracts';
 import { ThemisAuction } from 'contracts';
 import { ethers, utils, BigNumber } from 'ethers';
+import useTentativeBids from 'hooks/useTentativeBids';
 
 interface Props {
     project: Project;
@@ -22,6 +23,35 @@ const RevealBid = ({project, isRevealPeriod}: Props) => {
   const [salt, setSalt] = useState<string>('');
 
   const accountMerkleProof = [ethers.utils.hexlify('0x000001'), ethers.utils.hexlify('0x000002'),];
+
+  const {
+    loading: loadingBids,
+    error: errorBids,
+    data: dataBids,
+  } = useTentativeBids('0xf54ddd35f3adf7d2babab6251d4481a4acba5535');
+
+  console.log('bid list: ', dataBids);
+
+  const parseAmt = (bn: any) => {
+    return BigNumber.from(bn.amount);
+  }
+
+  const findInsertLimits = (sortedBids: any, bidAmount: BigNumber) => {
+    if (sortedBids?.length === 0) {
+      return { left: 0, right: 0 };
+    } else if (parseAmt(sortedBids[0]) < bidAmount) {
+      console.log('gt ', sortedBids[0].id);
+      return { left: 0, right: sortedBids[0].id };
+      }
+    else {
+      for (let i = 0; i < sortedBids.length - 1; i++) {
+        if (parseAmt(sortedBids[i]) >= bidAmount && parseAmt(sortedBids[i + 1]) <= bidAmount) {
+          return { left: sortedBids[i].id, right: sortedBids[i + 1].id };
+        }
+      }
+      return { left: sortedBids[sortedBids.length - 1].id, right: 0}
+    }
+  }
 
   const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -39,6 +69,7 @@ const RevealBid = ({project, isRevealPeriod}: Props) => {
       const _saltNum = ethers.BigNumber.from(salt);
       const _salt = ethers.utils.hexZeroPad(_saltNum.toHexString(), 32);
 
+      const token = auctionContract.collateralToken();
       // TODO: get proof
       let proof: ThemisAuction.CollateralizationProofStruct = {
         accountMerkleProof: accountMerkleProof,
@@ -49,9 +80,18 @@ const RevealBid = ({project, isRevealPeriod}: Props) => {
 
       console.log('bidder', signer._address);
       console.log('salt', _salt);
-      console.log('proof', proof);
+      // console.log('proof', proof);
 
-      return auctionContract.revealBid(signer._address, _salt, 0, 0, proof, { gasLimit });
+      const vaultAddress = await auctionContract.getVaultAddress(auctionContract.address, token, signer._address, _salt);
+      const localBidAmount = JSON.parse(localStorage.getItem(vaultAddress) || '0').bidAmount;
+
+      // const sortedBids = dataBids?.sort((a: any, b: any) => b.amount - a.amount);
+
+      const { left, right } = findInsertLimits(dataBids?.bids, localBidAmount);
+      console.log('REVEAL-BID left', left);
+      console.log('REVEAL-BID right', right);
+
+      return auctionContract.revealBid(signer._address, _salt, parseInt(left), parseInt(right), proof, { gasLimit });
     }
     return Promise.reject(new Error('Auction contract or provider not properly configured'));
   }

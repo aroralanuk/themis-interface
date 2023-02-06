@@ -13,7 +13,7 @@ const tentativeBidsQuery = gql`
     bids(where: { project: $projectId }) {
       id
       amount
-      timestamp
+      createdAt
       bidderAddress
     }
   }

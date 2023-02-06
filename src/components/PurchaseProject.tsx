@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { ethers, utils, BigNumber } from 'ethers';
+import { ethers, utils, BigNumber, } from 'ethers';
 import moment from 'moment';
 import { useWeb3React } from '@web3-react/core';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -65,10 +65,23 @@ const PurchaseProject = ({ project }: Props) => {
       const amount = BigNumber.from(bidAmount).mul(10 ** 6);
       console.log('bidAmount', amount);
 
+      setBidLocalStorage(vaultAddress, amount, saltHex);
+      console.log('localStorage', localStorage.getItem(vaultAddress));
       return token.transfer(vaultAddress, amount, { gasLimit: 1000000 });
     }
     return Promise.reject(new Error('Auction contract or provider not properly configured'));
   };
+
+  const setBidLocalStorage = (vaultAddress: string, bidAmount: BigNumber, salt: string) => {
+    if (ethers.utils.isAddress(vaultAddress) === true) {
+      const bid = {
+        bidAmount: bidAmount,
+        salt: salt
+      };
+      // console.log('bid', bid);
+      localStorage.setItem(vaultAddress, JSON.stringify(bid));
+    }
+  }
 
   const mint = () => {
     if (!provider || !mintContractAddress) {

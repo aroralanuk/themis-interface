@@ -88,7 +88,7 @@ export const notifyTx = async ({
       render: displayError(error, formatError(err)),
       type: toast.TYPE.ERROR,
       isLoading: false,
-      autoClose: 10000,
+      autoClose: 1000,
     });
     onError && onError(err);
   }

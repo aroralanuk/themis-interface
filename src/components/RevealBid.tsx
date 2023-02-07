@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Project } from 'utils/types';
+import { Collection } from 'utils/types';
 import { CHAINS } from 'utils/chains';
 import { Alert, Box, Button, TextField } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -12,12 +12,11 @@ import { ethers, utils, BigNumber } from 'ethers';
 import useTentativeBids from 'hooks/useTentativeBids';
 
 interface Props {
-    project: Project;
-    isRevealPeriod: boolean;
+  collection: Collection;
 }
 
 
-const RevealBid = ({project, isRevealPeriod}: Props) => {
+const RevealBid = ({ collection }: Props) => {
   const { chainId, isActive, account, connector, provider } = useWeb3React();
   const [pending, setPending] = useState(false);
   const [salt, setSalt] = useState<string>('');
@@ -28,7 +27,7 @@ const RevealBid = ({project, isRevealPeriod}: Props) => {
     loading: loadingBids,
     error: errorBids,
     data: dataBids,
-  } = useTentativeBids('0xf54ddd35f3adf7d2babab6251d4481a4acba5535');
+  } = useTentativeBids(collection.id);
 
   console.log('bid list: ', dataBids);
 
@@ -76,7 +75,7 @@ const RevealBid = ({project, isRevealPeriod}: Props) => {
         blockHeaderRLP: ethers.utils.hexlify('0x00000000'),
       };
 
-      const gasLimit = await auctionContract.estimateGas.revealBid(signer._address, _salt, 0, 0, proof);
+
 
       console.log('bidder', signer._address);
       console.log('salt', _salt);
@@ -86,12 +85,21 @@ const RevealBid = ({project, isRevealPeriod}: Props) => {
       const localBidAmount = JSON.parse(localStorage.getItem(vaultAddress) || '0').bidAmount;
 
       // const sortedBids = dataBids?.sort((a: any, b: any) => b.amount - a.amount);
+      console.log("REVEAL-BID highestBids: ", dataBids.projects[0].highestBids);
 
-      const { left, right } = findInsertLimits(dataBids?.bids, localBidAmount);
+      const { left, right } = findInsertLimits(dataBids.projects[0].highestBids, localBidAmount);
       console.log('REVEAL-BID left', left);
       console.log('REVEAL-BID right', right);
 
-      return auctionContract.revealBid(signer._address, _salt, parseInt(left), parseInt(right), proof, { gasLimit });
+      const gasLimit = await auctionContract.estimateGas.revealBid(
+        signer._address,
+        _salt,
+        BigNumber.from(left),
+        BigNumber.from(right),
+        proof
+      );
+
+      return auctionContract.revealBid(signer._address, _salt, BigNumber.from(left), BigNumber.from(right), proof, { gasLimit });
     }
     return Promise.reject(new Error('Auction contract or provider not properly configured'));
   }
@@ -115,13 +123,13 @@ const RevealBid = ({project, isRevealPeriod}: Props) => {
     });
   };
 
-  if (!project) {
+  if (!collection) {
     return null;
   }
 
-  if (!isRevealPeriod) {
-    return <Alert severity='info'>Project is not active</Alert>;
-  }
+  // if (!isRevealPeriod) {
+  //   return <Alert severity='info'>Project is not active</Alert>;
+  // }
 
   if (chainId !== expectedChainId) {
     return (

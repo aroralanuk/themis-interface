@@ -7,8 +7,8 @@ const MINUTE = SECOND * 60;
 const HOUR = MINUTE * 60;
 const DAY = HOUR * 24;
 
-const Timer = ({ deadline = new Date().toString() }) => {
-  const parsedDeadline: any = useMemo(() => new Date(Number(deadline)), [deadline]);
+const Timer = ({ deadline = new Date() }) => {
+  const parsedDeadline: any = useMemo(() => new Date(deadline), [deadline]);
   const [time, setTime] = useState(parsedDeadline - Date.now());
 
   useEffect(() => {

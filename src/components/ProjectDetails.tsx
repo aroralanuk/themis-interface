@@ -28,6 +28,7 @@ import { graphQLURL, goerliGraphURL, tokensPerPage } from 'config';
 
 interface Props {
   id: string;
+  collectionId: string;
 }
 
 interface TitleProps {
@@ -44,8 +45,10 @@ const Title = ({ children }: TitleProps) => (
   </Typography>
 );
 
-const ProjectDetails = ({ id }: Props) => {
-  const { loading2, error2, data2 } = useProject2('0xf54ddd35f3adf7d2babab6251d4481a4acba5535');
+const ProjectDetails = ({ id, collectionId }: Props) => {
+  console.log("PROJECT DETAILS - collectionId: ", collectionId);
+  const { loading2, error2, data2 } = useProject2(collectionId);
+  console.log("PROJECT DETAILS - data2: ", data2);
   const { loading, error, data } = useProject(id);
   const [currentPage, setCurrentPage] = useState(0);
   const [orderDirection, setOrderDirection] = useState(OrderDirection.ASC);
@@ -69,7 +72,7 @@ const ProjectDetails = ({ id }: Props) => {
   }
 
   const project = data?.project;
-  const project2 = data2?.project;
+  const project2 = data2?.projects[0];
 
   const token = project?.tokens[0];
   const width = size.width > theme.breakpoints.values.md
@@ -79,7 +82,6 @@ const ProjectDetails = ({ id }: Props) => {
         : size.width - 32;
 
   const {
-    name,
     description,
     artistName,
     website,
@@ -92,23 +94,58 @@ const ProjectDetails = ({ id }: Props) => {
   } = project;
 
   const {
+    name,
     bidDeadline,
-    revealDeadline
+    revealDeadline,
   } = project2;
 
-  // const bidEnd: Date = new Date(Number(bidDeadline) * 1000);
-  const bidEnd = new Date("1675311652");
+  const bidEnd: Date = new Date(Number(bidDeadline) * 1000);
   console.log("BID END :", bidEnd);
 
-  // const revealEnd = new Date(Number(revealDeadline) * 1000);
-  const revealEnd = new Date("1675312652");
+  const revealEnd = new Date(Number(revealDeadline) * 1000);
 
   const currTime = new Date();
+  // const beforeBid = !isAuctionInitiated && currTime < bidEnd;
   const isBidPeriod = currTime < bidEnd;
-  const isRevealPeriod = currTime > bidEnd && currTime < revealEnd;
 
-  // const isBidPeriod = true;
-  // const isRevealPeriod = true;
+  const isRevealPeriod = currTime > bidEnd && currTime < revealEnd;
+    console.log('IS REVEAL PERIOD: ', isRevealPeriod);
+
+  const DeadlineWindow = () => {
+    if (isBidPeriod) {
+      return (
+        <>
+          <Typography variant='h6' mt={3}>
+            Bid deadline
+          </Typography>
+          <Timer deadline={bidEnd} />
+        </>
+      );
+    } else if (isRevealPeriod) {
+      return (
+        <>
+          <Typography variant='h6' mt={3}>
+            Reveal deadline
+          </Typography>
+          <Timer deadline={revealEnd} />
+          <Box sx={{ fontWeight: 'bold' }}>
+            {invocations} / {maxInvocations} revealed
+          </Box>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <Typography variant='h6' mt={3}>
+            Auction has ended
+          </Typography>
+          <Box sx={{ fontWeight: 'bold' }}>
+            {invocations} / {maxInvocations} revealed
+          </Box>
+        </>
+      );
+    }
+  }
 
   const des =
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
@@ -120,7 +157,7 @@ const ProjectDetails = ({ id }: Props) => {
           <Link href='/' underline='hover' sx={{ color: '#666' }}>
             Home
           </Link>
-          <Typography>Test Collection</Typography>
+          <Typography>{name}</Typography>
         </Breadcrumbs>
 
         <Grid spacing={2} container>
@@ -143,8 +180,7 @@ const ProjectDetails = ({ id }: Props) => {
               <ProjectStats paused={paused} complete={complete} startTime={project?.minterConfiguration?.startTime} />
 
               <Typography variant='h4' mt={3}>
-                {/* {name} */}
-                Test collection
+                {name}
               </Typography>
 
               <Typography variant='h6' mb={2}>
@@ -154,15 +190,7 @@ const ProjectDetails = ({ id }: Props) => {
 
               <Divider sx={{ display: ['none', 'block', 'none'], marginBottom: 2 }} />
 
-              <Typography variant='h6' mt={3}>
-                Bid deadline
-              </Typography>
-              {isBidPeriod || <Timer deadline={bidEnd.toTimeString()} />}
-              {isRevealPeriod && <Timer deadline={revealEnd.toTimeString()} />}
-
-              <Box sx={{ fontWeight: 'bold' }}>
-                {invocations} / {maxInvocations} minted
-              </Box>
+              <DeadlineWindow/>
 
               <Box
                 sx={{
@@ -172,14 +200,14 @@ const ProjectDetails = ({ id }: Props) => {
                   marginBottom: 3,
                 }}
               >
-                <LinearProgress
+                {/* <LinearProgress
                   sx={{ width: 'calc(100% - 48px)' }}
                   value={(invocations / maxInvocations) * 100}
                   variant='determinate'
                 />
-                <Box sx={{ fontSize: 12 }}>{Math.floor((invocations / maxInvocations) * 100)} %</Box>
+                <Box sx={{ fontSize: 12 }}>{Math.floor((invocations / maxInvocations) * 100)} %</Box> */}
               </Box>
-              {isRevealPeriod || <RevealBid project={project2} isRevealPeriod />}
+              {isRevealPeriod && <RevealBid collection={project2} />}
               {isBidPeriod || <PurchaseProject project={project} />}
             </Box>
           </Grid>
@@ -188,8 +216,7 @@ const ProjectDetails = ({ id }: Props) => {
         <Grid spacing={2} container mt={4} pb={4}>
           <Grid item md={7} sm={12} xs={12}>
             <Typography variant='h6' mb={2}>
-              {/* About {name} */}
-              About Test Collection
+              About <b>{name}</b>
             </Typography>
             <Box paddingRight={[0, 0, 4]}>
               <Collapsible content={des} />
@@ -259,6 +286,7 @@ const ProjectDetails = ({ id }: Props) => {
 
           <TokenList
             projectId={id}
+            collectionId={collectionId}
             first={tokensPerPage}
             skip={currentPage * tokensPerPage}
             orderDirection={orderDirection}

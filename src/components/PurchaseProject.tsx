@@ -24,6 +24,7 @@ interface Props {
 }
 
 const PurchaseProject = ({ project }: Props) => {
+  console.log('PURCHASE-PROJECT project: ', project);
   const { chainId, isActive, account, connector, provider } = useWeb3React();
   const startTime = project?.minterConfiguration?.startTime && moment.unix(parseInt(project.minterConfiguration?.startTime?.toString()));
   const usesCustomToken = project?.currencyAddress !== ethers.constants.AddressZero;

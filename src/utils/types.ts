@@ -18,6 +18,10 @@ export interface Project {
   minterConfiguration?: MinterConfiguration;
 }
 
+export interface Collection {
+  id: string;
+}
+
 export interface Account {
   id: string;
 }
@@ -28,6 +32,14 @@ export interface Token {
   uri: string;
   createdAt: BigInt;
   owner?: Account;
+}
+
+export interface Bid {
+  id: string;
+  amount: BigInt;
+  createdAt: BigInt;
+  position: BigInt;
+  bidder: Account;
 }
 
 export interface MinterConfiguration {

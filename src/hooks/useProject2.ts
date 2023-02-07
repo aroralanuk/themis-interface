@@ -2,8 +2,9 @@ import { useQuery, gql } from '@apollo/client';
 
 const testQuery = gql`
   query GetProject ($id: ID!) {
-    project(id: $id) {
+    projects(id: $id) {
       id
+      name
       mintActive
       owner
       auctionStart

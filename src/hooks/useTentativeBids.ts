@@ -10,14 +10,19 @@ interface TentativeBidQueryParams {
 
 const tentativeBidsQuery = gql`
   query GetTentativeBids($projectId: ID!) {
-    bids(where: { project: $projectId }) {
-      id
-      amount
-      createdAt
-      bidderAddress
+    projects(id: $projectId) {
+      highestBids(orderBy: amount, orderDirection: desc) {
+        id
+        bidder
+        amount
+        createdAt
+        position
+      }
     }
   }
 `;
+
+
 
 const useTentativeBids = (projectId: string) => {
   // const first = params?.first || tokensPerPage;
